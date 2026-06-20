@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rádio Simmundo Online</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top left, #7c2cff 0%, #32104f 35%, #0f0b1a 100%);
+      color: #fff;
+      min-height: 100vh;
+    }
+    header {
+      padding: 26px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      font-size: 22px;
+    }
+    .logo-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ff2fb3, #7c2cff);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      box-shadow: 0 0 25px rgba(255,47,179,.5);
+    }
+    .status {
+      padding: 10px 18px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      font-size: 14px;
+    }
+    .status span { color: #43ff9f; font-weight: bold; }
+    .hero {
+      padding: 25px 7% 45px;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 34px;
+      align-items: center;
+    }
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 74px);
+      line-height: 1;
+      margin-bottom: 18px;
+    }
+    .hero h1 strong {
+      background: linear-gradient(90deg, #ff2fb3, #ffd86b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: rgba(255,255,255,.82);
+      max-width: 650px;
+      margin-bottom: 26px;
+    }
+    .buttons { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-weight: bold;
+      transition: .25s;
+    }
+    .btn-primary { background: linear-gradient(135deg, #ff2fb3, #7c2cff); }
+    .btn-outline { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+    .player-card {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 25px 60px rgba(0,0,0,.35);
+      backdrop-filter: blur(12px);
+    }
+    .cover {
+      height: 260px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.35), transparent 25%),
+        linear-gradient(135deg, #ff2fb3, #7c2cff 55%, #24103d);
+      display: grid;
+      place-items: center;
+      margin-bottom: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover:before, .cover:after {
+      content: "";
+      position: absolute;
+      border: 2px solid rgba(255,255,255,.18);
+      border-radius: 50%;
+    }
+    .cover:before { width: 190px; height: 190px; }
+    .cover:after { width: 120px; height: 120px; }
+    .mic { font-size: 78px; z-index: 1; }
+    audio { width: 100%; margin: 10px 0 18px; }
+    .now {
+      font-size: 14px;
+      color: rgba(255,255,255,.7);
+      margin-bottom: 6px;
+    }
+    .song { font-size: 22px; font-weight: 800; }
+    .grid {
+      padding: 10px 7% 55px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .card {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 22px;
+      padding: 24px;
+      min-height: 180px;
+    }
+    .card h2 { font-size: 22px; margin-bottom: 16px; }
+    .card ul { list-style: none; display: grid; gap: 12px; }
+    .card li {
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.07);
+      color: rgba(255,255,255,.86);
+    }
+    .highlight {
+      border-left: 4px solid #ff2fb3;
+    }
+    .form input, .form textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 13px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.1);
+      color: #fff;
+      outline: none;
+    }
+    .form input::placeholder, .form textarea::placeholder { color: rgba(255,255,255,.55); }
+    footer {
+      padding: 24px 7%;
+      text-align: center;
+      color: rgba(255,255,255,.65);
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    @media (max-width: 900px) {
+      .hero, .grid { grid-template-columns: 1fr; }
+      header { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🎙️</div>
+      <div>Rádio Simmundo Online</div>
+    </div>
+    <div class="status"><span>● AO VIVO</span> 24h conectando informação, música e negócios</div>
+  </header>
+
+  <main class="hero">
+    <section>
+      <h1>A rádio que conecta <strong>equipe, clientes e representantes.</strong></h1>
+      <p>
+        Uma central online para músicas, comunicados, treinamentos, campanhas comerciais,
+        lançamentos CETILUX/NOWARA e conteúdos especiais do Grupo Simmundo.
+      </p>
+      <div class="buttons">
+        <a class="btn btn-primary" href="#player">▶ Ouvir agora</a>
+        <a class="btn btn-outline" href="https://wa.me/5581999999999?text=Olá,%20quero%20pedir%20uma%20música%20na%20Rádio%20Simmundo" target="_blank">💬 Pedir música</a>
+      </div>
+    </section>
+
+    <section class="player-card" id="player">
+      <div class="cover"><div class="mic">🎧</div></div>
+      <div class="now">Tocando agora</div>
+      <div class="song">Programação Simmundo • Ao Vivo</div>
+      <audio controls>
+        <source src="https://stream.zeno.fm/0r0xa792kwzuv" type="audio/mpeg">
+        Seu navegador não suporta áudio online.
+      </audio>
+      <p style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.5;">
+        Link de transmissão demonstrativo. Depois substituímos pelo link oficial do streaming contratado.
+      </p>
+    </section>
+  </main>
+
+  <section class="grid">
+    <div class="card">
+      <h2>📅 Programação</h2>
+      <ul>
+        <li><strong>08h</strong> Boletim Comercial</li>
+        <li><strong>10h</strong> Giro CETILUX</li>
+        <li><strong>14h</strong> Treinamento de Produtos</li>
+        <li><strong>17h</strong> Resumo do Dia</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>📢 Mural de Avisos</h2>
+      <ul>
+        <li class="highlight">Nova campanha comercial disponível para representantes.</li>
+        <li class="highlight">Treinamentos CETILUX e NOWARA em destaque.</li>
+        <li class="highlight">Envie sugestões de pauta pelo WhatsApp.</li>
+      </ul>
+    </div>
+
+    <div class="card form">
+      <h2>🎵 Pedido de Música</h2>
+      <input id="nome" placeholder="Seu nome" />
+      <input id="musica" placeholder="Nome da música" />
+      <textarea id="recado" rows="3" placeholder="Recado opcional"></textarea>
+      <button class="btn btn-primary" style="border:0;width:100%;cursor:pointer;" onclick="enviarPedido()">Enviar pelo WhatsApp</button>
+    </div>
+  </section>
+
+  <section class="grid" style="padding-top:0;">
+    <div class="card">
+      <h2>🏆 Destaques</h2>
+      <ul>
+        <li>Produto da semana</li>
+        <li>Campanha em andamento</li>
+        <li>Representante em destaque</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>🎤 Espaço do Locutor</h2>
+      <ul>
+        <li>Vinhetas institucionais</li>
+        <li>Chamadas comerciais</li>
+        <li>Entrevistas com equipe e clientes</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>📲 Redes Sociais</h2>
+      <ul>
+        <li>@cetilux</li>
+        <li>@nowara.br</li>
+        <li>Grupo Simmundo</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Rádio Simmundo Online • Versão 1.0 • Desenvolvido para comunicação, vendas e treinamento.
+  </footer>
+
+  <script>
+    function enviarPedido() {
+      const nome = document.getElementById('nome').value || 'Ouvinte';
+      const musica = document.getElementById('musica').value || 'Não informado';
+      const recado = document.getElementById('recado').value || 'Sem recado';
+      const telefone = '5581999999999';
+      const texto = `Olá, sou ${nome}. Quero pedir a música: ${musica}. Recado: ${recado}`;
+      window.open(`https://wa.me/${telefone}?text=${encodeURIComponent(texto)}`, '_blank');
+    }
+  </script>
+</body>
+</html>
