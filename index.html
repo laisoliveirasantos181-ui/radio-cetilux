@@ -190,8 +190,13 @@
 
     <section class="player-card" id="player">
       <div class="cover"><div class="mic">🎧</div></div>
-      <div class="now">Tocando agora</div>
-      <div class="song">Programação Simmundo • Ao Vivo</div>
+      <div class="now">🎵 Tocando Agora</div>
+<div class="song" id="musicaAtual">Carregando...</div>
+
+<div style="margin-top:10px;color:rgba(255,255,255,.7);font-size:14px;">
+⏭ Próxima Música:
+<span id="proximaMusica">Carregando...</span>
+</div>
      <audio id="playerAudio" controls style="width:100%;">
 Seu navegador não suporta áudio.
 </audio>
@@ -218,15 +223,36 @@ const playlist = [
 let atual = 0;
 const player = document.getElementById("playerAudio");
 
+function atualizarInfo() {
+
+  document.getElementById("musicaAtual").innerText =
+    playlist[atual].replace(".mp3","");
+
+  let proxima = atual + 1;
+
+  if(proxima >= playlist.length){
+    proxima = 0;
+  }
+
+  document.getElementById("proximaMusica").innerText =
+    playlist[proxima].replace(".mp3","");
+}
+
 player.src = playlist[atual];
+atualizarInfo();
 
 player.addEventListener("ended", function() {
+
   atual++;
-  if (atual >= playlist.length) {
+
+  if(atual >= playlist.length){
     atual = 0;
   }
+
   player.src = playlist[atual];
+  atualizarInfo();
   player.play();
+
 });
 </script>
       <p style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.5;">
