@@ -195,15 +195,26 @@
 
     <section class="player-card" id="player">
       <div class="cover"><div class="mic">🎧</div></div>
-      <div class="now">🎵 Tocando Agora</div>
+     <div class="now">🎵 Tocando Agora</div>
 <div class="song" id="musicaAtual">Carregando...</div>
 
 <div style="margin-top:10px;color:rgba(255,255,255,.7);font-size:14px;">
 ⏭ Próxima Música:
 <span id="proximaMusica">Carregando...</span>
 </div>
-     <audio id="playerAudio" controls style="width:100%;">
-Seu navegador não suporta áudio.
+
+<div style="margin-top:8px;color:rgba(255,255,255,.7);font-size:14px;">
+📻 Playlist:
+<span id="totalMusicas">0 músicas</span>
+</div>
+
+<div style="margin-top:6px;color:rgba(255,255,255,.7);font-size:14px;">
+🎧 Status:
+<span id="statusPlayer">Aguardando play</span>
+</div>
+
+<audio id="playerAudio" controls style="width:100%;">
+   Seu navegador não suporta áudio.
 </audio>
 
 <script>
@@ -228,10 +239,20 @@ const playlist = [
 let atual = 0;
 const player = document.getElementById("playerAudio");
 
+player.addEventListener("play", function() {
+  document.getElementById("statusPlayer").innerText = "Tocando";
+});
+
+player.addEventListener("pause", function() {
+  document.getElementById("statusPlayer").innerText = "Pausado";
+});
+
 function atualizarInfo() {
 
   document.getElementById("musicaAtual").innerText =
     playlist[atual].replace(".mp3","");
+  document.getElementById("totalMusicas").innerText =
+  playlist.length + " músicas";
 
   let proxima = atual + 1;
 
