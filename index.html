@@ -172,7 +172,12 @@
       <div class="logo-icon">🎙️</div>
       <div>Rádio Simmundo Online</div>
     </div>
-    <div class="status"><span>● AO VIVO</span> 24h conectando informação, música e negócios</div>
+   <div class="status">
+<span>● AO VIVO</span>
+24h conectando informação, música e negócios
+<br>
+🕒 <span id="relogio"></span>
+</div>
   </header>
 
   <main class="hero">
@@ -255,9 +260,9 @@ player.addEventListener("ended", function() {
 
 });
 </script>
-      <p style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.5;">
-        Link de transmissão demonstrativo. Depois substituímos pelo link oficial do streaming contratado.
-      </p>
+     <p style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.5;">
+🎙️ Rádio Simmundo Online • Playlist automática 24 horas.
+</p>
     </section>
   </main>
 
@@ -333,5 +338,24 @@ player.addEventListener("ended", function() {
       window.open(`https://wa.me/${telefone}?text=${encodeURIComponent(texto)}`, '_blank');
     }
   </script>
+  <script>
+function atualizarRelogio() {
+
+  const agora = new Date();
+
+  const hora =
+    agora.toLocaleTimeString('pt-BR');
+
+  const data =
+    agora.toLocaleDateString('pt-BR');
+
+  document.getElementById("relogio").innerHTML =
+    data + " • " + hora;
+}
+
+setInterval(atualizarRelogio, 1000);
+
+atualizarRelogio();
+</script>
 </body>
 </html>
