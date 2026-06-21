@@ -276,6 +276,15 @@
 🎧 Status:
 <span id="statusPlayer">Aguardando play</span>
 </div>
+      <div style="margin-top:15px;">
+  <strong>📝 Últimas Tocadas</strong>
+  <ul id="historicoMusicas" style="
+      margin-top:8px;
+      padding-left:20px;
+      color:rgba(255,255,255,.8);
+      font-size:14px;">
+  </ul>
+</div>
 
 <audio id="playerAudio" controls style="width:100%;">
    Seu navegador não suporta áudio.
@@ -301,6 +310,7 @@ const playlist = [
 ];
 
 let atual = 0;
+  let historico = [];
 const player = document.getElementById("playerAudio");
 
 player.addEventListener("play", function() {
@@ -315,6 +325,19 @@ function atualizarInfo() {
 
   document.getElementById("musicaAtual").innerText =
     playlist[atual].replace(".mp3","");
+  const musicaAtual =
+playlist[atual].replace(".mp3","");
+
+if (!historico.includes(musicaAtual)) {
+  historico.unshift(musicaAtual);
+
+  if (historico.length > 5) {
+    historico.pop();
+  }
+}
+
+document.getElementById("historicoMusicas").innerHTML =
+historico.map(m => `<li>${m}</li>`).join("");
   document.getElementById("totalMusicas").innerText =
   playlist.length + " músicas";
 
