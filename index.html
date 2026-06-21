@@ -396,7 +396,9 @@ atualizarInfo();
   });
 }
 
-player.addEventListener("ended", tocarProximaMusica);
+player.onended = function() {
+  tocarProximaMusica();
+};
 
 function proximaMusicaManual() {
   tocarProximaMusica();
