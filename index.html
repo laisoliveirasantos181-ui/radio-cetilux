@@ -315,26 +315,76 @@ onclick="proximaMusicaManual()">
 
 <script>
 const playlist = [
-"radio-cetilux.mp3",
-"radio-cetilux (1).mp3",
-"radio-cetilux (2).mp3",
-"radio-cetilux (3).mp3",
-"radio-cetilux (4).mp3",
-"radio-cetilux (5).mp3",
-"radio-cetilux (6).mp3",
-"radio-cetilux (7).mp3",
-"radio-cetilux (8).mp3",
-"radio-cetilux (9).mp3",
-"radio-cetilux (10).mp3",
-"radio-cetilux (11).mp3",
-"radio-cetilux (12).mp3",
-"radio-cetilux (13).mp3",
-"radio-cetilux (14).mp3"
+  "radio-cetilux.mp3",
+  "radio-cetilux (1).mp3",
+  "radio-cetilux (2).mp3",
+  "radio-cetilux (3).mp3",
+  "radio-cetilux (4).mp3",
+  "radio-cetilux (5).mp3",
+  "radio-cetilux (6).mp3",
+  "radio-cetilux (7).mp3",
+  "radio-cetilux (8).mp3",
+  "radio-cetilux (9).mp3",
+  "radio-cetilux (10).mp3",
+  "radio-cetilux (11).mp3",
+  "radio-cetilux (12).mp3",
+  "radio-cetilux (13).mp3",
+  "radio-cetilux (14).mp3"
 ];
 
 let atual = 0;
-  let historico = [];
+let historico = [];
 const player = document.getElementById("playerAudio");
+
+function atualizarInfo() {
+  const musicaAtual = playlist[atual].replace(".mp3", "");
+
+  document.getElementById("musicaAtual").innerText = musicaAtual;
+  document.getElementById("totalMusicas").innerText = playlist.length + " músicas";
+  document.getElementById("statPlaylist").innerText = playlist.length;
+
+  if (!historico.includes(musicaAtual)) {
+    historico.unshift(musicaAtual);
+    if (historico.length > 5) historico.pop();
+  }
+
+  document.getElementById("statHistorico").innerText = historico.length;
+  document.getElementById("historicoMusicas").innerHTML =
+    historico.map(m => `<li>${m}</li>`).join("");
+
+  let proxima = atual + 1;
+  if (proxima >= playlist.length) proxima = 0;
+
+  document.getElementById("proximaMusica").innerText =
+    playlist[proxima].replace(".mp3", "");
+}
+
+function carregarMusica() {
+  player.src = playlist[atual];
+  player.load();
+  atualizarInfo();
+}
+
+function tocarRadio() {
+  player.play();
+}
+
+function tocarProximaMusica() {
+  atual++;
+  if (atual >= playlist.length) atual = 0;
+
+  carregarMusica();
+
+  player.play().catch(function(err) {
+    console.log("Reprodução automática bloqueada:", err);
+  });
+}
+
+function proximaMusicaManual() {
+  tocarProximaMusica();
+}
+
+player.addEventListener("ended", tocarProximaMusica);
 
 player.addEventListener("play", function() {
   document.getElementById("statusPlayer").innerText = "Tocando";
@@ -344,67 +394,9 @@ player.addEventListener("pause", function() {
   document.getElementById("statusPlayer").innerText = "Pausado";
 });
 
-function atualizarInfo() {
-
-  document.getElementById("musicaAtual").innerText =
-    playlist[atual].replace(".mp3","");
-  const musicaAtual =
-playlist[atual].replace(".mp3","");
-
-if (!historico.includes(musicaAtual)) {
-  historico.unshift(musicaAtual);
-
-  if (historico.length > 5) {
-    historico.pop();
-  }
-}
-
-document.getElementById("historicoMusicas").innerHTML =
-historico.map(m => `<li>${m}</li>`).join("");
-  document.getElementById("totalMusicas").innerText =
-  playlist.length + " músicas";
-  document.getElementById("statPlaylist").innerText =
-playlist.length;
-
-document.getElementById("statHistorico").innerText =
-historico.length;
-
-  let proxima = atual + 1;
-
-  if(proxima >= playlist.length){
-    proxima = 0;
-  }
-
-  document.getElementById("proximaMusica").innerText =
-    playlist[proxima].replace(".mp3","");
-}
-
-player.src = playlist[atual];
-atualizarInfo();
- function tocarProximaMusica() {
-  atual++;
-
-  if (atual >= playlist.length) {
-    atual = 0;
-  }
-
-  player.src = playlist[atual];
-  atualizarInfo();
-
-  player.play().catch(function(err){
-    console.log("Autoplay bloqueado:", err);
-  });
-}
-
-player.onended = function() {
-  tocarProximaMusica();
-};
-
-function proximaMusicaManual() {
-  tocarProximaMusica();
-}
-
+carregarMusica();
 </script>
+
      <p style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.5;">
 🎙️ Rádio Simmundo Online • Playlist automática 24 horas.
 </p>
@@ -601,6 +593,7 @@ setInterval(() => {
 let bannerAtual = 0;
 
 function trocarBannerCorporativo(){
+
   document.getElementById("bannerCorporativo").innerText =
     bannersCorporativos[bannerAtual];
 
@@ -609,12 +602,10 @@ function trocarBannerCorporativo(){
   if(bannerAtual >= bannersCorporativos.length){
     bannerAtual = 0;
   }
+
 }
-function tocarRadio() {
-  const player = document.getElementById("playerAudio");
-  player.play();
-}
-    let ouvintesOnline = 127;
+  
+     let ouvintesOnline = 127;
 
 function atualizarOuvintesOnline() {
   let variacao = Math.floor(Math.random() * 5) - 2;
