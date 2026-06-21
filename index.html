@@ -386,13 +386,16 @@ player.addEventListener("ended", function() {
     </div>
 
     <div class="card">
-      <h2>📢 Mural de Avisos</h2>
-      <ul>
-        <li class="highlight">Nova campanha comercial disponível para representantes.</li>
-        <li class="highlight">Treinamentos CETILUX e NOWARA em destaque.</li>
-        <li class="highlight">Envie sugestões de pauta pelo WhatsApp.</li>
-      </ul>
-    </div>
+  <h2>📢 Central de Comunicados</h2>
+  <div id="comunicadoRotativo" class="highlight" style="
+    padding:16px;
+    border-radius:14px;
+    background:rgba(255,255,255,.07);
+    line-height:1.5;
+    min-height:110px;">
+    Carregando comunicado...
+  </div>
+</div>
 
     <div class="card form">
       <h2>🎵 Pedido de Música</h2>
@@ -464,6 +467,30 @@ function atualizarRelogio() {
 setInterval(atualizarRelogio, 1000);
 
 atualizarRelogio();
+</script>
+  <script>
+const comunicados = [
+  "📢 CAMPANHA CETILUX<br><strong>Ofertas especiais para representantes.</strong><br>Consulte condições comerciais vigentes.",
+  "💡 TREINAMENTO DE PRODUTOS<br><strong>CETILUX e NOWARA em destaque.</strong><br>Fique atento à programação da equipe comercial.",
+  "🏆 DESTAQUE COMERCIAL<br><strong>Acompanhe metas, campanhas e lançamentos.</strong><br>Rádio Simmundo conectando informação e vendas.",
+  "🎵 PEDIDO DE MÚSICA<br><strong>Envie sua sugestão pelo WhatsApp.</strong><br>Participe da programação da rádio."
+];
+
+let comunicadoAtual = 0;
+
+function trocarComunicado() {
+  document.getElementById("comunicadoRotativo").innerHTML =
+    comunicados[comunicadoAtual];
+
+  comunicadoAtual++;
+
+  if (comunicadoAtual >= comunicados.length) {
+    comunicadoAtual = 0;
+  }
+}
+
+trocarComunicado();
+setInterval(trocarComunicado, 5000);
 </script>
 </body>
 </html>
