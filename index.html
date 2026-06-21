@@ -305,8 +305,13 @@ target="_blank">
 </div>
 
 <audio id="playerAudio" controls style="width:100%;">
-   Seu navegador não suporta áudio.
+     Seu navegador não suporta áudio.
 </audio>
+      <button class="btn btn-outline"
+style="margin-top:10px;border:0;cursor:pointer;width:100%;"
+onclick="proximaMusicaManual()">
+⏭ Próxima música
+</button>
 
 <script>
 const playlist = [
@@ -376,20 +381,27 @@ historico.length;
 
 player.src = playlist[atual];
 atualizarInfo();
-
-player.addEventListener("ended", function() {
-
+ function tocarProximaMusica() {
   atual++;
 
-  if(atual >= playlist.length){
+  if (atual >= playlist.length) {
     atual = 0;
   }
 
   player.src = playlist[atual];
   atualizarInfo();
-  player.play();
 
-});
+  player.play().catch(function(err){
+    console.log("Autoplay bloqueado:", err);
+  });
+}
+
+player.addEventListener("ended", tocarProximaMusica);
+
+function proximaMusicaManual() {
+  tocarProximaMusica();
+}
+
 </script>
      <p style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.5;">
 🎙️ Rádio Simmundo Online • Playlist automática 24 horas.
@@ -415,18 +427,19 @@ player.addEventListener("ended", function() {
     <li>🎵 Músicas na Playlist: <span id="statPlaylist">0</span></li>
     <li>📝 Últimas Tocadas: <span id="statHistorico">0</span></li>
     <li>📢 Comunicados Ativos: <span id="statComunicados">0</span></li>
-    <li>📻 Rádio Online: 2026</li>
+<li>👥 Ouvintes Online: <span id="ouvintesOnline">127</span></li>
+<li>📻 Rádio Online: 2026</li>
   </ul>
 
 </div>
 
-    <div class="card form">
-     <h2>💬 Faça uma pergunta</h2>
-<input id="nome" placeholder="Seu nome" />
-<input id="musica" placeholder="Assunto da dúvida" />
-<textarea id="recado" rows="3" placeholder="Digite sua pergunta ou dúvida"></textarea>
-<button class="btn btn-primary" style="border:0;width:100%;cursor:pointer;" onclick="enviarPedido()">Enviar dúvida pelo WhatsApp</button>
-    </div>
+  <div class="card form">
+  <h2>💬 Faça uma pergunta</h2>
+  <input id="nome" placeholder="Seu nome" />
+  <input id="musica" placeholder="Assunto da dúvida" />
+  <textarea id="recado" rows="3" placeholder="Digite sua pergunta ou dúvida"></textarea>
+  <button class="btn btn-primary" style="border:0;width:100%;cursor:pointer;" onclick="enviarPedido()">Enviar dúvida pelo WhatsApp</button>
+</div>
   </section>
 
   <section class="grid" style="padding-top:0;">
@@ -599,6 +612,21 @@ function tocarRadio() {
   const player = document.getElementById("playerAudio");
   player.play();
 }
+    let ouvintesOnline = 127;
+
+function atualizarOuvintesOnline() {
+  let variacao = Math.floor(Math.random() * 5) - 2;
+
+  ouvintesOnline += variacao;
+
+  if (ouvintesOnline < 100) ouvintesOnline = 100;
+  if (ouvintesOnline > 150) ouvintesOnline = 150;
+
+  document.getElementById("ouvintesOnline").innerText = ouvintesOnline;
+}
+
+atualizarOuvintesOnline();
+setInterval(atualizarOuvintesOnline, 15000);
 trocarBannerCorporativo();
 setInterval(trocarBannerCorporativo, 4000);
 </script>
