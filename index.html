@@ -447,29 +447,47 @@ player.addEventListener("ended", function() {
       </ul>
     </div>
 
-    <div class="card">
+  <div class="card">
   <h2>📲 Redes Sociais e Sites</h2>
 
   <ul>
+
     <li>
       📸 Instagram CETILUX<br>
-      <strong>@cetiluxbr</strong>
+      <a href="https://www.instagram.com/cetiluxbr"
+         target="_blank"
+         style="color:#ffd86b;font-weight:bold;">
+         @cetiluxbr
+      </a>
     </li>
 
     <li>
       📸 Instagram NOWARA<br>
-      <strong>@nowara.br</strong>
+      <a href="https://www.instagram.com/nowara.br"
+         target="_blank"
+         style="color:#ffd86b;font-weight:bold;">
+         @nowara.br
+      </a>
     </li>
 
     <li>
       🌐 Site CETILUX<br>
-      <strong>www.cetilux.com.br</strong>
+      <a href="https://www.cetilux.com.br"
+         target="_blank"
+         style="color:#ffd86b;font-weight:bold;">
+         www.cetilux.com.br
+      </a>
     </li>
 
     <li>
       🌐 Site NOWARA<br>
-      <strong>www.nowara.com.br</strong>
+      <a href="https://www.nowara.com.br"
+         target="_blank"
+         style="color:#ffd86b;font-weight:bold;">
+         www.nowara.com.br
+      </a>
     </li>
+
   </ul>
 
 </div>
@@ -533,10 +551,15 @@ function trocarComunicado() {
     comunicadoAtual = 0;
   }
 }
-  document.getElementById("statComunicados").innerText =
+document.getElementById("statComunicados").innerText =
 comunicados.length;
+
 trocarComunicado();
 setInterval(trocarComunicado, 5000);
+
+setInterval(() => {
+  atualizarInfo();
+}, 10000);
 </script>
 </body>
 </html>
