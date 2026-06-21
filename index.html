@@ -111,6 +111,27 @@
     }
     .cover:before { width: 190px; height: 190px; }
     .cover:after { width: 120px; height: 120px; }
+    .logos-player{
+  position:absolute;
+  top:18px;
+  left:18px;
+  right:18px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:18px;
+  z-index:2;
+  flex-wrap:wrap;
+}
+
+.logos-player img{
+  max-height:42px;
+  max-width:130px;
+  object-fit:contain;
+  background:rgba(255,255,255,.92);
+  padding:6px 10px;
+  border-radius:10px;
+}
     .mic { font-size: 78px; z-index: 1; }
     .equalizer{
   display:flex;
@@ -222,7 +243,14 @@
     </section>
 
     <section class="player-card" id="player">
-      <div class="cover"><div class="mic">🎧</div></div>
+  <div class="cover">
+  <div class="logos-player">
+    <img src="logo-simmundo.png.jpeg" alt="Grupo Simmundo">
+    <img src="logo-cetilux.png.jpeg" alt="CETILUX">
+    <img src="logo-nowara.png.jpeg" alt="NOWARA">
+  </div>
+  <div class="mic">🎧</div>
+</div>
      <div class="now">🎵 Tocando Agora</div>
 <div class="song" id="musicaAtual">Carregando...</div>
       <div class="equalizer">
