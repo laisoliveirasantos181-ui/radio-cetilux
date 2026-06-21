@@ -236,6 +236,8 @@
 24h conectando informação, música e negócios
 <br>
 🕒 <span id="relogio"></span>
+     <br>
+🌡️ <span id="temperaturaAtual">Carregando clima...</span>
 </div>
   </header>
   <div class="banner-corporativo" id="bannerCorporativo">
@@ -679,6 +681,26 @@ setInterval(trocarComunicado, 5000);
 setInterval(trocarBannerCorporativo, 4000);
 atualizarOuvintesOnline();
 setInterval(atualizarOuvintesOnline, 15000);
+</script>
+  <script>
+function carregarTemperatura() {
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=-8.05&longitude=-34.90&current=temperature_2m,wind_speed_10m&timezone=America%2FRecife")
+    .then(response => response.json())
+    .then(data => {
+      const temp = data.current.temperature_2m;
+      const vento = data.current.wind_speed_10m;
+
+      document.getElementById("temperaturaAtual").innerText =
+        "Recife: " + temp + "°C • Vento " + vento + " km/h";
+    })
+    .catch(error => {
+      document.getElementById("temperaturaAtual").innerText =
+        "Clima indisponível";
+    });
+}
+
+carregarTemperatura();
+setInterval(carregarTemperatura, 600000);
 </script>
 </body>
 </html>
