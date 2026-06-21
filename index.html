@@ -340,6 +340,11 @@ document.getElementById("historicoMusicas").innerHTML =
 historico.map(m => `<li>${m}</li>`).join("");
   document.getElementById("totalMusicas").innerText =
   playlist.length + " músicas";
+  document.getElementById("statPlaylist").innerText =
+playlist.length;
+
+document.getElementById("statHistorico").innerText =
+historico.length;
 
   let proxima = atual + 1;
 
@@ -385,16 +390,16 @@ player.addEventListener("ended", function() {
       </ul>
     </div>
 
-    <div class="card">
-  <h2>📢 Central de Comunicados</h2>
-  <div id="comunicadoRotativo" class="highlight" style="
-    padding:16px;
-    border-radius:14px;
-    background:rgba(255,255,255,.07);
-    line-height:1.5;
-    min-height:110px;">
-    Carregando comunicado...
-  </div>
+   <div class="card">
+  <h2>📊 Estatísticas da Rádio</h2>
+
+  <ul>
+    <li>🎵 Músicas na Playlist: <span id="statPlaylist">0</span></li>
+    <li>📝 Últimas Tocadas: <span id="statHistorico">0</span></li>
+    <li>📢 Comunicados Ativos: <span id="statComunicados">0</span></li>
+    <li>📻 Rádio Online: 2026</li>
+  </ul>
+
 </div>
 
     <div class="card form">
@@ -407,6 +412,19 @@ player.addEventListener("ended", function() {
   </section>
 
   <section class="grid" style="padding-top:0;">
+    <div class="card">
+  <h2>📢 Central de Comunicados</h2>
+
+  <div id="comunicadoRotativo" class="highlight" style="
+    padding:16px;
+    border-radius:14px;
+    background:rgba(255,255,255,.07);
+    line-height:1.6;
+    min-height:120px;">
+    Carregando comunicado...
+  </div>
+
+</div>
     <div class="card">
       <h2>🏆 Destaques</h2>
       <ul>
@@ -470,10 +488,13 @@ atualizarRelogio();
 </script>
   <script>
 const comunicados = [
-  "📢 CAMPANHA CETILUX<br><strong>Ofertas especiais para representantes.</strong><br>Consulte condições comerciais vigentes.",
-  "💡 TREINAMENTO DE PRODUTOS<br><strong>CETILUX e NOWARA em destaque.</strong><br>Fique atento à programação da equipe comercial.",
-  "🏆 DESTAQUE COMERCIAL<br><strong>Acompanhe metas, campanhas e lançamentos.</strong><br>Rádio Simmundo conectando informação e vendas.",
-  "🎵 PEDIDO DE MÚSICA<br><strong>Envie sua sugestão pelo WhatsApp.</strong><br>Participe da programação da rádio."
+"🏆 CAMPANHA COPA CETILUX<br><strong>Pedido mínimo R$ 5.000.</strong><br>Validade até 19/06/2026.",
+
+"💡 TREINAMENTO CETILUX<br><strong>Perfis e Fitas LED.</strong><br>Dia 12/06 às 09h.",
+
+"✨ NOWARA DECORATIVOS<br><strong>Linha Premium disponível.</strong><br>Consulte seu supervisor.",
+
+"🎵 RÁDIO SIMMUNDO<br><strong>Peça sua música pelo WhatsApp.</strong><br>(81) 99624-4781"
 ];
 
 let comunicadoAtual = 0;
@@ -488,7 +509,8 @@ function trocarComunicado() {
     comunicadoAtual = 0;
   }
 }
-
+  document.getElementById("statComunicados").innerText =
+comunicados.length;
 trocarComunicado();
 setInterval(trocarComunicado, 5000);
 </script>
