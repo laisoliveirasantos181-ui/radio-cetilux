@@ -202,6 +202,17 @@
       outline: none;
     }
     .form input::placeholder, .form textarea::placeholder { color: rgba(255,255,255,.55); }
+    .banner-corporativo{
+  margin: 0 7% 20px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255,47,179,.25), rgba(124,44,255,.25));
+  border: 1px solid rgba(255,255,255,.16);
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: .4px;
+  box-shadow: 0 15px 35px rgba(0,0,0,.25);
+}
     footer {
       padding: 24px 7%;
       text-align: center;
@@ -227,6 +238,9 @@
 🕒 <span id="relogio"></span>
 </div>
   </header>
+  <div class="banner-corporativo" id="bannerCorporativo">
+  Carregando destaque...
+</div>
 
   <main class="hero">
     <section>
@@ -236,7 +250,7 @@
         lançamentos CETILUX/NOWARA e conteúdos especiais do Grupo Simmundo.
       </p>
       <div class="buttons">
-        <a class="btn btn-primary" href="#player">▶ Ouvir agora</a>
+<a class="btn btn-primary" href="#player" onclick="tocarRadio()">▶ Ouvir agora</a>
        <a class="btn btn-outline"
 href="https://wa.me/5581996244781?text=Olá,%20tenho%20uma%20dúvida%20sobre%20os%20produtos%20CETILUX%20ou%20NOWARA."
 target="_blank">
@@ -454,19 +468,19 @@ player.addEventListener("ended", function() {
 
     <li>
       📸 Instagram CETILUX<br>
-      <a href="https://www.instagram.com/cetiluxbr"
+      <a href="https://www.instagram.com/cetilux.br"
          target="_blank"
          style="color:#ffd86b;font-weight:bold;">
-         @cetiluxbr
+         @cetilux.br
       </a>
     </li>
 
     <li>
       📸 Instagram NOWARA<br>
-      <a href="https://www.instagram.com/nowara.br"
+      <a href="https://www.instagram.com/nowarabr"
          target="_blank"
          style="color:#ffd86b;font-weight:bold;">
-         @nowara.br
+         @nowarabr
       </a>
     </li>
 
@@ -536,7 +550,7 @@ const comunicados = [
 
 "✨ NOWARA DECORATIVOS<br><strong>Linha Premium disponível.</strong><br>Consulte seu supervisor.",
 
-"🎵 RÁDIO SIMMUNDO<br><strong>Peça sua música pelo WhatsApp.</strong><br>(81) 99624-4781"
+"💬 RÁDIO SIMMUNDO<br><strong>Tire sua dúvida pelo WhatsApp.</strong><br>(81) 99624-4781"
 ];
 
 let comunicadoAtual = 0;
@@ -560,6 +574,33 @@ setInterval(trocarComunicado, 5000);
 setInterval(() => {
   atualizarInfo();
 }, 10000);
+    
+    const bannersCorporativos = [
+  "🏆 CAMPANHA COPA CETILUX • Pedido mínimo R$ 5.000",
+  "💡 DICA DA SEMANA • Perfis e Fitas LED em destaque",
+  "✨ NOWARA DECORATIVOS • Linha Premium disponível",
+  "📢 COMUNICADOS INTERNOS • Fique atento às novidades",
+  "🎙️ RÁDIO SIMMUNDO ONLINE • Música, informação e negócios"
+];
+
+let bannerAtual = 0;
+
+function trocarBannerCorporativo(){
+  document.getElementById("bannerCorporativo").innerText =
+    bannersCorporativos[bannerAtual];
+
+  bannerAtual++;
+
+  if(bannerAtual >= bannersCorporativos.length){
+    bannerAtual = 0;
+  }
+}
+function tocarRadio() {
+  const player = document.getElementById("playerAudio");
+  player.play();
+}
+trocarBannerCorporativo();
+setInterval(trocarBannerCorporativo, 4000);
 </script>
 </body>
 </html>
