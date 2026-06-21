@@ -605,17 +605,24 @@ function trocarBannerCorporativo(){
 
 }
   
-     let ouvintesOnline = 127;
+    const urlOuvintes = "https://script.google.com/macros/s/AKfycbwWV5IRs1VMFx3_YOMwHfwU8eqVxLjJ967E3ybPwheU_pH3eiCHyR887w2MzqnRSj44SA/exec";
+
+let idOuvinte = localStorage.getItem("radioSimmundoId");
+
+if (!idOuvinte) {
+  idOuvinte = "ouvinte_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
+  localStorage.setItem("radioSimmundoId", idOuvinte);
+}
 
 function atualizarOuvintesOnline() {
-  let variacao = Math.floor(Math.random() * 5) - 2;
-
-  ouvintesOnline += variacao;
-
-  if (ouvintesOnline < 100) ouvintesOnline = 100;
-  if (ouvintesOnline > 150) ouvintesOnline = 150;
-
-  document.getElementById("ouvintesOnline").innerText = ouvintesOnline;
+  fetch(urlOuvintes + "?acao=online&id=" + encodeURIComponent(idOuvinte))
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById("ouvintesOnline").innerText = data.online;
+    })
+    .catch(error => {
+      console.log("Erro ao atualizar ouvintes:", error);
+    });
 }
 
 atualizarOuvintesOnline();
