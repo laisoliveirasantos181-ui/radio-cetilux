@@ -588,19 +588,46 @@ setInterval(atualizarRelogio, 1000);
 atualizarRelogio();
 </script>
   <script>
-const comunicados = [
-"🏆 CAMPANHA COPA CETILUX<br><strong>Pedido mínimo R$ 5.000.</strong><br>Validade até 19/07/2026.",
-
-"💡 DICA CETILUX<br><strong>Perfis e Fitas LED.</strong><br>TUDO PARA ILUMINAR SEU AMBIENTE.",
-
-"✨ NOWARA DECORATIVOS<br><strong>Linha Premium disponível.</strong><br>Consulte seu supervisor.",
-
-"💬 RÁDIO SIMMUNDO<br><strong>Tire sua dúvida pelo WhatsApp.</strong><br>(81) 99624-4781"
-];
-
+let comunicados = [];
 let comunicadoAtual = 0;
 
+let bannersCorporativos = [];
+let bannerAtual = 0;
+
+const urlDadosRadio = "https://script.google.com/macros/s/AKfycbwWV5IRs1VMFx3_YOMwHfwU8eqVxLjJ967E3ybPwheU_pH3eiCHyR887w2MzqnRSj44SA/exec?acao=dadosRadio";
+
+function carregarDadosRadio() {
+
+  fetch(urlDadosRadio)
+
+    .then(response => response.json())
+
+    .then(data => {
+
+      comunicados = data.comunicados.map(item =>
+        item.titulo + "<br><strong>" + item.descricao + "</strong>"
+      );
+
+      bannersCorporativos = data.banners;
+
+      document.getElementById("statComunicados").innerText =
+        comunicados.length;
+
+      trocarComunicado();
+      trocarBannerCorporativo();
+
+    })
+
+    .catch(error => {
+      console.log("Erro ao carregar dados da rádio:", error);
+    });
+
+}
+
 function trocarComunicado() {
+
+  if (comunicados.length === 0) return;
+
   document.getElementById("comunicadoRotativo").innerHTML =
     comunicados[comunicadoAtual];
 
@@ -610,37 +637,20 @@ function trocarComunicado() {
     comunicadoAtual = 0;
   }
 }
-document.getElementById("statComunicados").innerText =
-comunicados.length;
 
-trocarComunicado();
-setInterval(trocarComunicado, 5000);
-
-setInterval(() => {
-  atualizarInfo();
-}, 10000);
     
-    const bannersCorporativos = [
-  "🏆 CAMPANHA COPA CETILUX • Pedido mínimo R$ 5.000",
-  "💡 DICA DA SEMANA • Perfis e Fitas LED em destaque",
-  "✨ NOWARA DECORATIVOS • Linha Premium disponível",
-  "📢 COMUNICADOS INTERNOS • Fique atento às novidades",
-  "🎙️ RÁDIO SIMMUNDO ONLINE • Música, informação e negócios"
-];
+   function trocarBannerCorporativo(){
 
-let bannerAtual = 0;
-
-function trocarBannerCorporativo(){
+  if (bannersCorporativos.length === 0) return;
 
   document.getElementById("bannerCorporativo").innerText =
     bannersCorporativos[bannerAtual];
 
   bannerAtual++;
 
-  if(bannerAtual >= bannersCorporativos.length){
+  if (bannerAtual >= bannersCorporativos.length){
     bannerAtual = 0;
   }
-
 }
   
     const urlOuvintes = "https://script.google.com/macros/s/AKfycbwWV5IRs1VMFx3_YOMwHfwU8eqVxLjJ967E3ybPwheU_pH3eiCHyR887w2MzqnRSj44SA/exec";
@@ -662,11 +672,13 @@ function atualizarOuvintesOnline() {
       console.log("Erro ao atualizar ouvintes:", error);
     });
 }
+carregarDadosRadio();
 
+setInterval(carregarDadosRadio, 60000);
+setInterval(trocarComunicado, 5000);
+setInterval(trocarBannerCorporativo, 4000);
 atualizarOuvintesOnline();
 setInterval(atualizarOuvintesOnline, 15000);
-trocarBannerCorporativo();
-setInterval(trocarBannerCorporativo, 4000);
 </script>
 </body>
 </html>
