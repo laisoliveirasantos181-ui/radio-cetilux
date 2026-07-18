@@ -317,12 +317,7 @@ onclick="proximaMusicaManual()">
 
 <script>
 const URL_PLAYLIST = "https://script.google.com/macros/s/AKfycbwWV5IRs1VMFx3_YOMwHfwU8eqVxLjJ967E3ybPwheU_pH3eiCHyR887w2MzqnRSj44SA/exec?acao=playlist";
-const vinhetas = [
-  "vinheta-cetilux.mp3.mp3",
-  "vinheta-nowara.mp3.mp3",
-  "vinheta-radio.mp3.mp3",
-  "vinheta-simmundo.mp3.mp3"
-];
+const vinhetas = []; // Vinhetas temporariamente desativadas até serem reenviadas.
 let playlist = [];
 let contadorMusicas = 0;
 let tocandoVinheta = false;
@@ -340,14 +335,21 @@ async function carregarPlaylistOnline() {
     if (!dados.sucesso || !Array.isArray(dados.musicas) || dados.musicas.length === 0) {
       throw new Error("Nenhuma música ativa encontrada.");
     }
-   playlist = dados.musicas.map(function(musica) {
+   playlist = dados.musicas.map(function(musica, indice) {
+  const ordem = Number(musica.ordem) || (indice + 1);
+  const arquivoPadrao = String(ordem).padStart(3, "0") + ".mp3";
+  const arquivo = (musica.arquivo || arquivoPadrao).trim();
+
   return {
     id: musica.id,
     titulo: musica.titulo || "Música sem título",
     artista: musica.artista || "Artista desconhecido",
-url: "audio/001.mp3?v=5",
-    ordem: musica.ordem || 0
+    arquivo: arquivo,
+    url: "audio/" + encodeURIComponent(arquivo) + "?v=3",
+    ordem: ordem
   };
+}).sort(function(a, b) {
+  return a.ordem - b.ordem;
 });
     atual = 0;
     document.getElementById("totalMusicas").innerText = playlist.length + (playlist.length === 1 ? " música" : " músicas");
@@ -443,8 +445,17 @@ player.addEventListener("pause", function() {
   if (!player.ended) document.getElementById("statusPlayer").innerText = "Pausado";
 });
 player.addEventListener("error", function() {
-  console.error("Erro no arquivo de áudio:", player.error);
-  document.getElementById("statusPlayer").innerText = "Erro ao reproduzir áudio";
+  const item = playlist[atual];
+  const arquivo = item && item.arquivo ? item.arquivo : "arquivo não identificado";
+  console.error("Erro no arquivo de áudio:", arquivo, player.error);
+  document.getElementById("statusPlayer").innerText = "Arquivo indisponível: " + arquivo;
+
+  if (playlist.length > 1 && !tocandoVinheta) {
+    setTimeout(function() {
+      atual = (atual + 1) % playlist.length;
+      carregarMusica();
+    }, 1500);
+  }
 });
 carregarPlaylistOnline();
 </script>
@@ -567,7 +578,7 @@ carregarPlaylistOnline();
   </section>
 
  <footer>
-  Rádio Simmundo Online • Versão 2.1 • Metadados pela planilha e áudio pelo GitHub.
+  Rádio Simmundo Online • Versão 3.0 • Playlist administrada pela planilha e áudios no GitHub.
   <br><br>
   © 2026 Todos os direitos reservados • Grupo Simmundo
 </footer>
