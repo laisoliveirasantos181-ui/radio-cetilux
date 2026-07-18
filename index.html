@@ -317,91 +317,232 @@ onclick="proximaMusicaManual()">
 
 <script>
 const URL_PLAYLIST = "https://script.google.com/macros/s/AKfycbwWV5IRs1VMFx3_YOMwHfwU8eqVxLjJ967E3ybPwheU_pH3eiCHyR887w2MzqnRSj44SA/exec?acao=playlist";
-const vinhetas = []; // Vinhetas temporariamente desativadas até serem reenviadas.
+const PASTA_MUSICAS = "audio/";
+const PASTA_VINHETAS = "vinhetas/";
+const QUANTIDADE_MUSICAS_ENTRE_VINHETAS = 3;
+const VERSAO_AUDIO = "4";
+
 let playlist = [];
-let contadorMusicas = 0;
-let tocandoVinheta = false;
-let vinhetaAtual = 0;
+let vinhetas = [];
 let atual = 0;
+let vinhetaAtual = 0;
+let musicasDesdeUltimaVinheta = 0;
+let tocandoVinheta = false;
 let historico = [];
+let carregamentoInicialConcluido = false;
+
 const player = document.getElementById("playerAudio");
 
+function montarUrlAudio(pasta, arquivo) {
+  return pasta + encodeURIComponent(String(arquivo).trim()) + "?v=" + VERSAO_AUDIO;
+}
+
 async function carregarPlaylistOnline() {
-  document.getElementById("statusPlayer").innerText = "Carregando playlist...";
+  document.getElementById("statusPlayer").innerText = "Carregando músicas e vinhetas...";
+
   try {
-    const resposta = await fetch(URL_PLAYLIST, { cache: "no-store" });
-    if (!resposta.ok) throw new Error("Falha ao consultar a playlist.");
+    const resposta = await fetch(URL_PLAYLIST + "&_=" + Date.now(), {
+      cache: "no-store"
+    });
+
+    if (!resposta.ok) {
+      throw new Error("Falha ao consultar a playlist.");
+    }
+
     const dados = await resposta.json();
+
     if (!dados.sucesso || !Array.isArray(dados.musicas) || dados.musicas.length === 0) {
       throw new Error("Nenhuma música ativa encontrada.");
     }
-   playlist = dados.musicas.map(function(musica, indice) {
-  const ordem = Number(musica.ordem) || (indice + 1);
-  const arquivoPadrao = String(ordem).padStart(3, "0") + ".mp3";
-  const arquivo = (musica.arquivo || arquivoPadrao).trim();
 
-  return {
-    id: musica.id,
-    titulo: musica.titulo || "Música sem título",
-    artista: musica.artista || "Artista desconhecido",
-    arquivo: arquivo,
-    url: "audio/" + encodeURIComponent(arquivo) + "?v=3",
-    ordem: ordem
-  };
-}).sort(function(a, b) {
-  return a.ordem - b.ordem;
-});
+    playlist = dados.musicas
+      .map(function(musica, indice) {
+        const ordem = Number(musica.ordem) || (indice + 1);
+        const arquivoPadrao = String(ordem).padStart(3, "0") + ".mp3";
+        const arquivo = String(musica.arquivo || arquivoPadrao).trim();
+
+        return {
+          id: musica.id,
+          titulo: musica.titulo || "Música sem título",
+          artista: musica.artista || "Artista desconhecido",
+          arquivo: arquivo,
+          url: montarUrlAudio(PASTA_MUSICAS, arquivo),
+          ordem: ordem,
+          tipo: "MUSICA"
+        };
+      })
+      .sort(function(a, b) {
+        return a.ordem - b.ordem;
+      });
+
+    vinhetas = (Array.isArray(dados.vinhetas) ? dados.vinhetas : [])
+      .map(function(vinheta, indice) {
+        const ordem = Number(vinheta.ordem) || (indice + 1);
+        const arquivoPadrao = String(ordem).padStart(3, "0") + ".mp3";
+        const arquivo = String(vinheta.arquivo || arquivoPadrao).trim();
+
+        return {
+          id: vinheta.id,
+          titulo: vinheta.titulo || "Vinheta institucional",
+          arquivo: arquivo,
+          url: montarUrlAudio(PASTA_VINHETAS, arquivo),
+          ordem: ordem,
+          tipo: "VINHETA"
+        };
+      })
+      .sort(function(a, b) {
+        return a.ordem - b.ordem;
+      });
+
     atual = 0;
-    document.getElementById("totalMusicas").innerText = playlist.length + (playlist.length === 1 ? " música" : " músicas");
-    document.getElementById("statPlaylist").innerText = playlist.length;
-    carregarMusica();
-    document.getElementById("statusPlayer").innerText = "Pronto para tocar";
+    vinhetaAtual = 0;
+    musicasDesdeUltimaVinheta = 0;
+    tocandoVinheta = false;
+
+    atualizarTotais();
+    carregarMusica(false);
+
+    document.getElementById("statusPlayer").innerText =
+      vinhetas.length > 0
+        ? "Pronto • vinheta a cada " + QUANTIDADE_MUSICAS_ENTRE_VINHETAS + " músicas"
+        : "Pronto para tocar";
+
+    carregamentoInicialConcluido = true;
+
   } catch (erro) {
     console.error("Erro ao carregar playlist:", erro);
+
     playlist = [];
+    vinhetas = [];
+
     document.getElementById("musicaAtual").innerText = "Playlist indisponível";
-    document.getElementById("proximaMusica").innerText = "Nenhuma música disponível";
-    document.getElementById("totalMusicas").innerText = "0 músicas";
+    document.getElementById("proximaMusica").innerText = "Nenhum áudio disponível";
+    document.getElementById("totalMusicas").innerText = "0 músicas • 0 vinhetas";
     document.getElementById("statPlaylist").innerText = "0";
+    document.getElementById("statVinhetas").innerText = "0";
     document.getElementById("statusPlayer").innerText = "Erro ao carregar";
+
     player.removeAttribute("src");
     player.load();
   }
 }
 
+function atualizarTotais() {
+  const textoMusicas = playlist.length + (playlist.length === 1 ? " música" : " músicas");
+  const textoVinhetas = vinhetas.length + (vinhetas.length === 1 ? " vinheta" : " vinhetas");
+
+  document.getElementById("totalMusicas").innerText = textoMusicas + " • " + textoVinhetas;
+  document.getElementById("statPlaylist").innerText = playlist.length;
+  document.getElementById("statVinhetas").innerText = vinhetas.length;
+}
+
 function nomeMusica(item) {
   if (!item) return "Música não identificada";
+
   const titulo = item.titulo || "Música sem título";
-  const artista = (item.artista || "").trim();
-  return artista && artista.toUpperCase() !== "DESCONHECIDO" ? titulo + " • " + artista : titulo;
+  const artista = String(item.artista || "").trim();
+
+  return artista && artista.toUpperCase() !== "DESCONHECIDO"
+    ? titulo + " • " + artista
+    : titulo;
 }
 
-function atualizarInfo() {
-  if (playlist.length === 0) return;
-  const musicaAtual = nomeMusica(playlist[atual]);
-  document.getElementById("musicaAtual").innerText = musicaAtual;
-  document.getElementById("totalMusicas").innerText = playlist.length + (playlist.length === 1 ? " música" : " músicas");
-  document.getElementById("statPlaylist").innerText = playlist.length;
-  historico.unshift(musicaAtual);
-  historico = historico.filter(function(item, indice) { return historico.indexOf(item) === indice; });
-  if (historico.length > 5) historico = historico.slice(0, 5);
+function nomeVinheta(item) {
+  if (!item) return "Vinheta institucional";
+  return "🎙️ " + (item.titulo || "Vinheta institucional");
+}
+
+function adicionarAoHistorico(musica) {
+  if (!musica) return;
+
+  const nome = nomeMusica(musica);
+
+  if (historico[0] !== nome) {
+    historico.unshift(nome);
+  }
+
+  historico = historico.filter(function(item, indice) {
+    return historico.indexOf(item) === indice;
+  });
+
+  if (historico.length > 5) {
+    historico = historico.slice(0, 5);
+  }
+
   document.getElementById("statHistorico").innerText = historico.length;
-  document.getElementById("historicoMusicas").innerHTML = historico.map(function(musica) { return "<li>" + musica + "</li>"; }).join("");
-  let proxima = atual + 1;
-  if (proxima >= playlist.length) proxima = 0;
-  document.getElementById("proximaMusica").innerText = nomeMusica(playlist[proxima]);
+  document.getElementById("historicoMusicas").innerHTML = historico
+    .map(function(item) {
+      return "<li>" + item + "</li>";
+    })
+    .join("");
 }
 
-function carregarMusica() {
+function atualizarProximoAudio() {
+  if (playlist.length === 0) {
+    document.getElementById("proximaMusica").innerText = "Nenhum áudio disponível";
+    return;
+  }
+
+  if (!tocandoVinheta &&
+      vinhetas.length > 0 &&
+      musicasDesdeUltimaVinheta + 1 >= QUANTIDADE_MUSICAS_ENTRE_VINHETAS) {
+    document.getElementById("proximaMusica").innerText =
+      nomeVinheta(vinhetas[vinhetaAtual]);
+    return;
+  }
+
+  const proxima = tocandoVinheta
+    ? atual
+    : (atual + 1) % playlist.length;
+
+  document.getElementById("proximaMusica").innerText =
+    nomeMusica(playlist[proxima]);
+}
+
+function carregarMusica(adicionarHistorico) {
   if (playlist.length === 0) return;
-  player.src = playlist[atual].url;
+
+  tocandoVinheta = false;
+
+  const musica = playlist[atual];
+  player.src = musica.url;
   player.load();
-  atualizarInfo();
+
+  document.getElementById("musicaAtual").innerText = nomeMusica(musica);
+
+  if (adicionarHistorico) {
+    adicionarAoHistorico(musica);
+  }
+
+  atualizarTotais();
+  atualizarProximoAudio();
+}
+
+function carregarVinheta() {
+  if (vinhetas.length === 0) {
+    avancarParaProximaMusica();
+    return;
+  }
+
+  tocandoVinheta = true;
+
+  const vinheta = vinhetas[vinhetaAtual];
+  player.src = vinheta.url;
+  player.load();
+
+  document.getElementById("musicaAtual").innerText = nomeVinheta(vinheta);
+  document.getElementById("proximaMusica").innerText = nomeMusica(playlist[atual]);
+
+  vinhetaAtual = (vinhetaAtual + 1) % vinhetas.length;
 }
 
 async function tocarRadio() {
-  if (playlist.length === 0) await carregarPlaylistOnline();
+  if (!carregamentoInicialConcluido || playlist.length === 0) {
+    await carregarPlaylistOnline();
+  }
+
   if (playlist.length === 0) return;
+
   try {
     await player.play();
   } catch (erro) {
@@ -410,58 +551,101 @@ async function tocarRadio() {
   }
 }
 
-function tocarProximaMusica() {
-  if (playlist.length === 0) return;
-  if (tocandoVinheta) {
-    tocandoVinheta = false;
-    atual = (atual + 1) % playlist.length;
-    carregarMusica();
-    player.play().catch(function(erro) { console.error("Erro ao tocar a próxima música:", erro); });
-    return;
-  }
-  contadorMusicas++;
-  if (contadorMusicas >= 3 && vinhetas.length > 0) {
-    contadorMusicas = 0;
-    tocandoVinheta = true;
-    player.src = vinhetas[vinhetaAtual];
-    player.load();
-    document.getElementById("musicaAtual").innerText = "🎙️ Vinheta Institucional";
-    document.getElementById("proximaMusica").innerText = nomeMusica(playlist[(atual + 1) % playlist.length]);
-    vinhetaAtual = (vinhetaAtual + 1) % vinhetas.length;
-    player.play().catch(function(erro) { console.error("Erro ao tocar vinheta:", erro); });
-    return;
-  }
+function avancarParaProximaMusica() {
   atual = (atual + 1) % playlist.length;
-  carregarMusica();
-  player.play().catch(function(erro) { console.error("Erro ao tocar a próxima música:", erro); });
+  carregarMusica(true);
+
+  player.play().catch(function(erro) {
+    console.error("Erro ao tocar a próxima música:", erro);
+  });
 }
 
-function proximaMusicaManual() { tocarProximaMusica(); }
-player.addEventListener("ended", tocarProximaMusica);
-player.addEventListener("play", function() {
-  document.getElementById("statusPlayer").innerText = tocandoVinheta ? "Tocando vinheta" : "Tocando";
-});
-player.addEventListener("pause", function() {
-  if (!player.ended) document.getElementById("statusPlayer").innerText = "Pausado";
-});
-player.addEventListener("error", function() {
-  const item = playlist[atual];
-  const arquivo = item && item.arquivo ? item.arquivo : "arquivo não identificado";
-  console.error("Erro no arquivo de áudio:", arquivo, player.error);
-  document.getElementById("statusPlayer").innerText = "Arquivo indisponível: " + arquivo;
+function concluirAudioAtual() {
+  if (playlist.length === 0) return;
 
-  if (playlist.length > 1 && !tocandoVinheta) {
-    setTimeout(function() {
-      atual = (atual + 1) % playlist.length;
-      carregarMusica();
-    }, 1500);
+  if (tocandoVinheta) {
+    musicasDesdeUltimaVinheta = 0;
+    carregarMusica(true);
+
+    player.play().catch(function(erro) {
+      console.error("Erro ao voltar para a música:", erro);
+    });
+
+    return;
+  }
+
+  musicasDesdeUltimaVinheta++;
+  atual = (atual + 1) % playlist.length;
+
+  if (vinhetas.length > 0 &&
+      musicasDesdeUltimaVinheta >= QUANTIDADE_MUSICAS_ENTRE_VINHETAS) {
+    carregarVinheta();
+
+    player.play().catch(function(erro) {
+      console.error("Erro ao tocar vinheta:", erro);
+    });
+
+    return;
+  }
+
+  carregarMusica(true);
+
+  player.play().catch(function(erro) {
+    console.error("Erro ao tocar a próxima música:", erro);
+  });
+}
+
+function proximaMusicaManual() {
+  concluirAudioAtual();
+}
+
+player.addEventListener("ended", concluirAudioAtual);
+
+player.addEventListener("play", function() {
+  document.getElementById("statusPlayer").innerText =
+    tocandoVinheta ? "Tocando vinheta institucional" : "Tocando";
+});
+
+player.addEventListener("pause", function() {
+  if (!player.ended) {
+    document.getElementById("statusPlayer").innerText = "Pausado";
   }
 });
+
+player.addEventListener("error", function() {
+  const itemAtual = tocandoVinheta
+    ? vinhetas[(vinhetaAtual - 1 + vinhetas.length) % vinhetas.length]
+    : playlist[atual];
+
+  const arquivo = itemAtual && itemAtual.arquivo
+    ? itemAtual.arquivo
+    : "arquivo não identificado";
+
+  console.error("Erro no arquivo de áudio:", arquivo, player.error);
+  document.getElementById("statusPlayer").innerText =
+    "Arquivo indisponível: " + arquivo + " • avançando...";
+
+  setTimeout(function() {
+    if (tocandoVinheta) {
+      tocandoVinheta = false;
+      musicasDesdeUltimaVinheta = 0;
+      carregarMusica(true);
+    } else {
+      atual = (atual + 1) % playlist.length;
+      carregarMusica(true);
+    }
+
+    player.play().catch(function(erro) {
+      console.error("Não foi possível continuar automaticamente:", erro);
+    });
+  }, 1200);
+});
+
 carregarPlaylistOnline();
 </script>
 
      <p style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.5;">
-🎙️ Rádio Simmundo Online • Playlist automática 24 horas.
+🎙️ Rádio Simmundo Online • Playlist automática 24 horas • Vinheta a cada 3 músicas.
 </p>
     </section>
   </main>
@@ -482,6 +666,7 @@ carregarPlaylistOnline();
 
   <ul>
     <li>🎵 Músicas na Playlist: <span id="statPlaylist">0</span></li>
+    <li>🎙️ Vinhetas Ativas: <span id="statVinhetas">0</span></li>
     <li>📝 Últimas Tocadas: <span id="statHistorico">0</span></li>
     <li>📢 Comunicados Ativos: <span id="statComunicados">0</span></li>
 <li>👥 Ouvintes Online: <span id="ouvintesOnline">127</span></li>
@@ -578,7 +763,7 @@ carregarPlaylistOnline();
   </section>
 
  <footer>
-  Rádio Simmundo Online • Versão 3.0 • Playlist administrada pela planilha e áudios no GitHub.
+  Rádio Simmundo Online • Versão 3.2 • Músicas e vinhetas administradas pela planilha e áudios no GitHub.
   <br><br>
   © 2026 Todos os direitos reservados • Grupo Simmundo
 </footer>
