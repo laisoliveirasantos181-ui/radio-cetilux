@@ -340,15 +340,15 @@ async function carregarPlaylistOnline() {
     if (!dados.sucesso || !Array.isArray(dados.musicas) || dados.musicas.length === 0) {
       throw new Error("Nenhuma música ativa encontrada.");
     }
-    playlist = dados.musicas.map(function(musica) {
-      return {
-        id: musica.id,
-        titulo: musica.titulo || "Música sem título",
-        artista: musica.artista || "Artista desconhecido",
-       url: "radio-cetilux.mp3.mp3?v=4",
-        ordem: musica.ordem || 0
-      };
-    });
+   playlist = dados.musicas.map(function(musica) {
+  return {
+    id: musica.id,
+    titulo: musica.titulo || "Música sem título",
+    artista: musica.artista || "Artista desconhecido",
+    url: "musicas/001.mp3?v=1",
+    ordem: musica.ordem || 0
+  };
+});
     atual = 0;
     document.getElementById("totalMusicas").innerText = playlist.length + (playlist.length === 1 ? " música" : " músicas");
     document.getElementById("statPlaylist").innerText = playlist.length;
